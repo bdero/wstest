@@ -1,34 +1,24 @@
 namespace wstest.fb;
 
-struct Vec2 {
-  x: float;
-  y: float;
+// Client->Server - Initial login payload.
+table LoginPayload {
+  username: string (required);
+  password: string (required);
 }
 
-struct Vec3 {
-  x: float;
-  y: float;
-  z: float;
+// Server->Client - Login response payload.
+// If success==false then errorMessage is populated with a failure reason.
+table LoginAckPayload {
+  success: bool;
+  error_message: string;
 }
 
-struct Color {
-  r: float;
-  g: float;
-  b: float;
+union AnyPayload {
+  LoginPayload, LoginAckPayload,
 }
 
-// Matches the vertex layout of the example shader, allowing for direct copying
-// into the host buffer.
-struct Vertex {
-  position: Vec3;
-  normal: Vec3;
-  tangent: Vec3;
-  texture_coords: Vec2;
+table Message {
+  payload: AnyPayload (required);
 }
 
-table Mesh {
-  vertices: [Vertex];
-  indices: [uint16];
-}
-
-root_type Mesh;
+root_type Message;
