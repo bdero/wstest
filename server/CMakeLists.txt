@@ -4,6 +4,8 @@ set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(THIRD_PARTY_DIR ${SOURCE_DIR}/third_party)
 set(GENERATED_DIR ${SOURCE_DIR}/generated)
 
+set(CLIENT_GENERATED_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../client/lib/generated)
+
 ### vcpkg
 
 if(WIN32)
@@ -46,3 +48,8 @@ flatbuffers_schema(
     TARGET wstest_server
     INPUT ${SOURCE_DIR}/protocol.fbs
     OUTPUT_DIR ${GENERATED_DIR})
+
+flatbuffers_schema_dart(
+    TARGET wstest_server
+    INPUT ${SOURCE_DIR}/protocol.fbs
+    OUTPUT_DIR ${CLIENT_GENERATED_DIR})

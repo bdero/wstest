@@ -27,11 +27,36 @@ function(flatbuffers_schema)
             "${ARG_INPUT}"
         MAIN_DEPENDENCY ${ARG_INPUT}
         OUTPUT "${OUTPUT_HEADER}"
-        COMMENT "Generating flatbuffer schema ${ARG_INPUT}"
+        COMMENT "Generating C++ flatbuffer schema ${ARG_INPUT}"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
     target_sources(${ARG_TARGET} PUBLIC "${OUTPUT_HEADER}")
     target_include_directories(${ARG_TARGET}
         PUBLIC
             $<BUILD_INTERFACE:${FLATBUFFERS_INCLUDE_DIR}>) # For includes starting with "flatbuffers/"
+endfunction()
+
+# flatbuffers_schema_dart(
+#    TARGET dependent
+#    INPUT filename
+#    OUTPUT_DIR path
+# )
+function(flatbuffers_schema_dart)
+    cmake_parse_arguments(ARG "" "TARGET;INPUT;OUTPUT_DIR" "" ${ARGN})
+
+    get_filename_component(INPUT_FILENAME ${ARG_INPUT} NAME_WE)
+
+    add_custom_command(
+        TARGET ${ARG_TARGET}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${ARG_OUTPUT_DIR}"
+        COMMAND "$<TARGET_FILE:flatc>"
+            --warnings-as-errors
+            --dart
+            --gen-object-api
+            -o "${ARG_OUTPUT_DIR}"
+            "${ARG_INPUT}"
+        MAIN_DEPENDENCY ${ARG_INPUT}
+        COMMENT "Generating Dart flatbuffer schema for ${ARG_INPUT}"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 endfunction()

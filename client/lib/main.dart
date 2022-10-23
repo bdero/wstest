@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'generated/protocol_wstest.fb_generated.dart';
 
 void main() => runApp(const MyApp());
 
