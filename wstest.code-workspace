@@ -1,0 +1,21 @@
+{
+    "folders": [
+        {
+            "path": "client",
+            "name": "WSTest Client"
+        },
+        {
+            "path": "server",
+            "name": "WSTest Server"
+        },
+    ],
+    "settings": {
+        "cmake.exportCompileCommandsFile": true,
+
+        "clangd.arguments": [
+            // workspaceFolder points to the first folder (client in this case):
+            // https://github.com/microsoft/vscode/issues/50372
+            "--compile-commands-dir=${workspaceFolder}/../server/out/build/ninja-debug",
+            "-header-insertion=iwyu",
+        ],}
+}

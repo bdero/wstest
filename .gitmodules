@@ -1,0 +1,9 @@
+[submodule "server/src/third_party/websocketpp"]
+	path = server/src/third_party/websocketpp
+	url = git@github.com:zaphoyd/websocketpp.git
+[submodule "server/src/third_party/asio"]
+	path = server/src/third_party/asio
+	url = git@github.com:chriskohlhoff/asio.git
+[submodule "server/vcpkg"]
+	path = server/vcpkg
+	url = git@github.com:microsoft/vcpkg.git
