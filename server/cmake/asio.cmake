@@ -1,10 +1,10 @@
 add_library(asio
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/asio/asio/src/asio.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/asio/asio/src/asio_ssl.cpp)
+    ${THIRD_PARTY_DIR}/asio/asio/src/asio.cpp
+    ${THIRD_PARTY_DIR}/asio/asio/src/asio_ssl.cpp)
 
 target_include_directories(asio
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/asio/asio/include)
+    ${THIRD_PARTY_DIR}/asio/asio/include)
 
 target_compile_definitions(asio
     PUBLIC

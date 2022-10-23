@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
 
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(THIRD_PARTY_DIR ${SOURCE_DIR}/third_party)
+set(GENERATED_DIR ${SOURCE_DIR}/generated)
+
 ### vcpkg
 
 if(WIN32)
@@ -24,14 +28,21 @@ set(NOT_MSVC $<NOT:$<CXX_COMPILER_ID:MSVC>>)
 
 find_package(OpenSSL REQUIRED)
 
-add_subdirectory(src/third_party/websocketpp)
+add_subdirectory(${THIRD_PARTY_DIR}/websocketpp)
 
-add_executable(wstest_server src/main.cc)
+add_executable(wstest_server ${SOURCE_DIR}/main.cc)
 
 target_include_directories(wstest_server
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/websocketpp)
+        ${SOURCE_DIR}
+        ${THIRD_PARTY_DIR}/websocketpp)
 
-include(asio.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/asio.cmake)
 target_link_libraries(wstest_server asio)
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/flatbuffers.cmake)
+
+flatbuffers_schema(
+    TARGET wstest_server
+    INPUT ${SOURCE_DIR}/protocol.fbs
+    OUTPUT_DIR ${GENERATED_DIR})

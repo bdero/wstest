@@ -8,6 +8,8 @@
 #include "websocketpp/roles/server_endpoint.hpp"
 #include "websocketpp/server.hpp"
 
+#include "generated/protocol_flatbuffers.h"
+
 int main() {
   try {
     std::cout << "testing" << std::endl;

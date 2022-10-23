@@ -7,3 +7,6 @@
 [submodule "server/vcpkg"]
 	path = server/vcpkg
 	url = git@github.com:microsoft/vcpkg.git
+[submodule "server/src/third_party/flatbuffers"]
+	path = server/src/third_party/flatbuffers
+	url = git@github.com:google/flatbuffers.git
