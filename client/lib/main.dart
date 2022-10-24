@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'generated/protocol_wstest.fb_generated.dart';
+import 'package:flat_buffers/flat_buffers.dart' as fb;
+import 'generated/protocol_wstest.fb_generated.dart' as protocol;
+import 'package:crypto/crypto.dart';
 
 void main() => runApp(const MyApp());
 
@@ -32,7 +36,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _controller = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   final _channel = WebSocketChannel.connect(
     Uri.parse('ws://localhost:9002'),
   );
@@ -49,9 +57,34 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Form(
-              child: TextFormField(
-                controller: _controller,
-                decoration: const InputDecoration(labelText: 'Send a message'),
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _usernameController,
+                    decoration: const InputDecoration(labelText: 'Username'),
+                    autocorrect: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Username required.';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: _passwordController,
+                    decoration: const InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Password required.';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 24),
@@ -73,15 +106,37 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      _channel.sink.add(_controller.text);
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final passwordBytes = utf8.encode(_passwordController.text);
+    final passwordDigest = sha512.convert(passwordBytes);
+
+    final builder = fb.Builder();
+
+    final loginPayload = protocol.LoginPayloadBuilder(builder)
+      ..begin()
+      ..addUsernameOffset(builder.writeString(_usernameController.text))
+      ..addPasswordOffset(builder.writeString(passwordDigest.toString()));
+
+    final messageBuilder = protocol.MessageBuilder(builder)
+      ..begin()
+      ..addPayloadType(protocol.AnyPayloadTypeId.LoginPayload)
+      ..addPayloadOffset(loginPayload.finish());
+
+    messageBuilder.finish();
+    builder.finish(messageBuilder.finish());
+
+    if (_usernameController.text.isNotEmpty) {
+      _channel.sink.add(builder.buffer);
     }
   }
 
   @override
   void dispose() {
     _channel.sink.close();
-    _controller.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 }
